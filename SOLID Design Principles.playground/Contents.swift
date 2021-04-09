@@ -1,6 +1,6 @@
 import UIKit
 
-//: Open-Closed Principle
+//: Open-Closed Principle and Specification
 
 enum Color {
   case red
@@ -30,79 +30,39 @@ class Product {
   }
 }
 
-
-func filterBySizeAndColor(_ products: [Product],
-                          _ size: Size,
-                          _ color: Color) -> [Product]
-{
-  var result = [Product]()
-  for p in products {
-    if (p.size == size), (p.color == color) {
-      result.append(p)
-    }
-  }
-  return result
-}
-
-protocol Specification {
+protocol Specificiation {
   associatedtype T
   func isSatisfied(_ item: T) -> Bool
 }
 
 protocol Filter {
   associatedtype T
-  func filter<Spec: Specification>(_ items: [T], _ spec: Spec) -> [T]
+  func filter<Spec: Specificiation>(_ item: [T], _ spec: Spec) -> [T]
   where Spec.T == T
 }
 
-class ColorSpecification: Specification {
-  typealias T = Product
+
+class ColorSpecification: Specificiation {
+  
   let color: Color
+  
   init(_ color: Color) {
     self.color = color
   }
+  
   func isSatisfied(_ item: Product) -> Bool {
     return item.color == color
   }
 }
 
-class SizeSpecification: Specification {
-  typealias T = Product
-  let size: Size
-  init(_ size: Size) {
-    self.size = size
-  }
-  func isSatisfied(_ item: Product) -> Bool {
-    return item.size == size
-  }
-}
-
-class AndSpecification<T,
-                       SpecA: Specification,
-                       SpecB: Specification> : Specification
-                       where SpecA.T == SpecB.T,
-                             T == SpecA.T {
-  
-  let first: SpecA
-  let second: SpecB
-  
-  init(_ first: SpecA, _ second: SpecB) {
-    self.first = first
-    self.second = second
-  }
-  
-  func isSatisfied(_ item: T) -> Bool {
-    return first.isSatisfied(item) && second.isSatisfied(item)
-  }
-}
-
-
 class BetterFilter: Filter {
+  
   typealias T = Product
-  func filter<Spec: Specification>(_ items: [Product], _ spec: Spec) ->
-  [T] where Spec.T == T {
-    var result = [Product]()
-    for i in items {
+  
+  var result = [Product]()
+  
+  func filter<Spec: Specificiation>(_ item: [Product], _ spec: Spec) -> [Product] where Spec.T == Product {
+    for i in item {
       if spec.isSatisfied(i) {
         result.append(i)
       }
@@ -111,7 +71,40 @@ class BetterFilter: Filter {
   }
 }
 
-func main() {
+class SizeSpecification: Specificiation {
+  
+  let size: Size
+  
+  init(_ size: Size) {
+    self.size = size
+  }
+  
+  func isSatisfied(_ item: Product) -> Bool {
+    return item.size == size
+  }
+}
+
+
+class AndSpecification<T,
+                       SpecA: Specificiation,
+                       SpecB: Specificiation>: Specificiation where T == SpecA.T,
+                                                                    SpecA.T == SpecB.T {
+
+  let specA: SpecA
+  let specB: SpecB
+  
+  init(_ first: SpecA, _ second: SpecB) {
+    self.specA = first
+    self.specB = second
+  }
+  
+  func isSatisfied(_ item: T) -> Bool {
+    return specA.isSatisfied(item) && specB.isSatisfied(item)
+  }
+}
+
+
+func openClosePrincipleSample() {
   
   let apple = Product("Apple", .red, .small)
   let tree = Product("Tree", .green, .large)
@@ -129,7 +122,8 @@ func main() {
   for p in bf.filter(products, AndSpecification(ColorSpecification(.blue), SizeSpecification(.large))) {
     print("- \(p.name) is large and blue")
   }
-  
 }
 
-main()
+//openClosePrincipleSample()
+
+
