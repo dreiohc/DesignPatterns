@@ -268,6 +268,7 @@ class Person {
 
 protocol RelationshipBrowser {
   func findAllChildrenOf(_ name: String) -> [Person]
+  func findParentOf(_ name: String) -> [Person]
 }
 
 class Relationships: RelationshipBrowser {
@@ -283,6 +284,10 @@ class Relationships: RelationshipBrowser {
   func findAllChildrenOf(_ name: String) -> [Person] {
     return relations.filter{ $0.name == name && $1 == .parent && $2 === $2 }.map{ $2 }
   }
+  
+  func findParentOf(_ name: String) -> [Person] {
+    return relations.filter{ $0.name == name && $1 == .child && $2 === $2 }.map{ $2 }
+  }
 }
 
 class Research { // high-level module
@@ -291,7 +296,13 @@ class Research { // high-level module
     for p in browser.findAllChildrenOf("John") {
       print("John has a child \(p.name)")
     }
+    
+    for c in browser.findParentOf("Matt") {
+      print("Matt's parent is \(c.name)")
+    }
   }
+  
+  
   
 }
 
