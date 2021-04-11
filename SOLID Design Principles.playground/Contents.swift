@@ -1,6 +1,7 @@
 import UIKit
 
 //: Open-Closed Principle and Specification
+//: Open for extension but closed for modification
 
 enum Color {
   case red
@@ -127,3 +128,128 @@ func openClosePrincipleSample() {
 //openClosePrincipleSample()
 
 
+//: Liskov Substitution Principle
+//: Passing in subtype will not break the function. Square here derives from rectangle so the function is still working.
+
+class Rectangle: CustomStringConvertible {
+  var _width = 0
+  var _height = 0
+  
+  var width: Int {
+    get { return _width }
+    set(value) { _width = value }
+  }
+  
+  var height: Int {
+    get { return _height }
+    set(value) { _height = value }
+  }
+  
+  init() {}
+  init(_ width: Int, _ height: Int) {
+    _width = width
+    _height = height
+  }
+  
+  var area: Int {
+    return width * height }
+  
+  public var description: String {
+    return "Width: \(width), height: \(height)" }
+}
+
+class Square: Rectangle {
+  
+  override var width: Int {
+    get { return _width }
+    set(value) {
+      _width = value
+      _height = value
+    }
+  }
+  
+  override var height: Int {
+    get { return _height }
+    set(value) {
+      _width = value
+      _height = value
+    }
+  }
+}
+
+func setAndMeasure(_ rc: Rectangle) {
+  rc.width = 4
+  rc.height = 3
+  print("Expected area to be 12 but got \(rc.area)")
+}
+
+func liskovPrincipleSample() {
+  let rc = Rectangle()
+  setAndMeasure(rc)
+  
+  let sq = Square()
+  setAndMeasure(sq)
+  
+}
+
+//liskovPrincipleSample()
+
+
+//: Interface Segregation Principle
+//: Implementing a large protocol but what if a certain class doesn't need all functions defined inside that protocol? Ans. Split the protocol.
+
+protocol Printer {
+  func print(d: Document)
+}
+
+protocol Scanner {
+  func scan(d: Document)
+}
+
+protocol Fax {
+  func fax(d: Document)
+}
+
+class OrdinaryPrinter: Printer {
+  func print(d: Document) {
+  }
+}
+
+class Document: Printer, Scanner {
+  func print(d: Document) {
+    // ok
+  }
+  
+  func scan(d: Document) {
+    // ok
+  }
+}
+
+protocol MultiFunctionDevice: Printer, Scanner, Fax {}
+
+
+class MultiFunctionMachine: MultiFunctionDevice {
+  
+  let printer: Printer
+  let scanner: Scanner
+  
+  init(printer: Printer, scanner: Scanner) {
+    self.printer = printer
+    self.scanner = scanner
+  }
+  
+  func print(d: Document) {
+    printer.print(d: d) // Decorator Pattern
+  }
+  
+  func scan(d: Document) {
+    scanner.scan(d: d)
+  }
+  
+  func fax(d: Document) {
+    
+  }
+  
+  
+}
+  
