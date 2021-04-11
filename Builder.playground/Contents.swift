@@ -90,4 +90,69 @@ func facetedBuilderSample() {
   
 }
 
-facetedBuilderSample()
+//facetedBuilderSample()
+
+
+//: Builder Coding Exercise
+
+class Field: CustomStringConvertible {
+  
+  var name: String
+  var type: String
+  init(_ name: String, _ type: String) {
+    self.name = name
+    self.type = type
+  }
+  
+  var description: String {
+    return "\(name): \(type)"
+  }
+  
+}
+
+
+class Class: CustomStringConvertible {
+  
+  var name = ""
+  var fields = [Field]()
+  
+  var description: String {
+    var s = ""
+    s.append("class \(name) \n{\n")
+    for f in fields {
+      s.append("\(f)\n")
+    }
+    s.append("}\n")
+    return s
+  }
+}
+
+class CodeBuilder: CustomStringConvertible {
+  
+  private var theClass = Class()
+  
+  init(_ rootName: String) {
+    theClass.name = rootName
+  }
+  
+  func addField(calledName name: String, ofType type: String) -> CodeBuilder  {
+    theClass.fields.append(Field(name, type))
+    return self
+  }
+  
+  var description: String {
+    return theClass.description
+  }
+}
+
+func builderCodingExercise() {
+  let field = CodeBuilder("Person")
+  field
+    .addField(calledName: "name", ofType: "String")
+    .addField(calledName: "age", ofType: "Int")
+    .description
+  
+  print(field)
+}
+
+//builderCodingExercise()
