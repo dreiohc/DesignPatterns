@@ -271,9 +271,8 @@ protocol RelationshipBrowser {
   func findParentOf(_ name: String) -> [Person]
 }
 
-class Relationships: RelationshipBrowser {
+class Relationships: RelationshipBrowser { // low-level module
 
-  // low-level module
   private var relations = [(Person, Relationship, Person)]()
   
   func addParentAndChild(_ p: Person, _ c: Person) {
@@ -301,9 +300,6 @@ class Research { // high-level module
       print("Matt's parent is \(c.name)")
     }
   }
-  
-  
-  
 }
 
 func dependencyInversionPrincipleSample() {
